@@ -5,6 +5,8 @@ class User {
       this.age = age;
       this.gender = gender;
       this.friends = []; // Array of Users
+      this.sentMessages = [];
+      this.receivedMessages = [];
     }
   
     addFriend(user) {
@@ -26,6 +28,26 @@ class User {
             return console.log(`${this.name}\'s friends: ${this.getFriends()}`)
         });
     }
+
+    getReceivedMessages() {
+      return this.receivedMessages.map((message) => {
+        return message.messageBody + ` (${message.sender.name})`;
+      });
+    }
+
+    getSentMessages() {
+      return this.sentMessages.map((message) => {
+        return message.messageBody + ` (${message.receiver.name})`;
+      });
+    }
+
+    sendMessage(recipient, messageBody) { // (User, String)
+      const message = new Message(messageBody);
+      message.sender = this;
+      message.receiver = recipient;
+      this.sentMessages.push(message);
+      recipient.receivedMessages.push(message);
+    }
   }
 
   class Message {
@@ -33,7 +55,7 @@ class User {
         this.messageBody = messageBody; // String
         this.messageBodyCompressed = "";
         this.sender;                    // User
-        this.receiver                   // User
+        this.receiver;                  // User
         this.metadata = {
             messageLengthOriginal: this.messageBody.length,
             messageLengthCompressed: this.messageBodyCompressed.length,
@@ -149,10 +171,9 @@ Pedro.addFriend(Ashlyn);
 Pedro.addFriend(James);
 Pedro.addFriend(Kai);
 
-// Print friends list to console
-users.forEach((user) => {
-    user.printFriends();
-});
+// Send some messages
+Pedro.sendMessage(Kai, "When we riding tonight?");
+Justin.sendMessage(Kai, "How much for the R7?");
   
 // Create nodes and edges for Vis.js
 const nodes = new vis.DataSet();
@@ -161,7 +182,9 @@ const edges = new vis.DataSet();
 // Add user nodes (blue)
 users.forEach((user) => {
     const friendsList = user.getFriends();
-    const popUP = `friends: ${friendsList}`;
+    const popUP = `Friends: ${friendsList}
+    Sent messages: ${user.getSentMessages()}
+    Received messages: ${user.getReceivedMessages()}`;
     nodes.add({
         id: user.name,
         label: `${user.name}`,
@@ -182,7 +205,7 @@ user.friends.forEach((friend) => {
 });
 });
   
-// Visualization options
+// Vis.js visualization options
 const options = {
 nodes: {
     font: {
