@@ -280,6 +280,8 @@ function addNode() {
     nodes.add({
       id: newNodeId,
       label: `Node ${newNodeId}`,
+      title: `Sent messages: none
+      Received messages: none`,
       color: "#2adefe",
       shape: "square",
     });
@@ -290,6 +292,8 @@ function addNode() {
     nodes.add({
       id: newNodeId,
       label: `${newName}`, // If the text field has a name, set it as the node's name
+      title: `Sent messages: none
+      Received messages: none`,
       color: "#2adefe",
       shape: "square",
     });
@@ -299,26 +303,69 @@ function addNode() {
   newNodeId++;
 }
 
-// Listen for click events to select a node
-network.on("click", function (params) {
-  if (params.nodes.length > 0) {
-    selectedNodeId = params.nodes[0]; // Get the ID of the clicked node
-    const selectedNode = nodes.get(selectedNodeId);
-    document.getElementById("nodeNameInput").value = selectedNode.label; // Pre-fill input
-  } else {
-    selectedNodeId = null; // Clear selection if no node is clicked
-    document.getElementById("nodeNameInput").value = ""; // Clear input
-  }
-});
-
 // Function to rename the selected node
 function renameNode() {
   const newName = document.getElementById("nodeNameInput").value.trim();
-  if (selectedNodeId !== null && newName) {
-    nodes.update({ id: selectedNodeId, label: newName });
-    userArray.find((user) => user.name == selectedNodeId).name = newName; // Set the new name of the user
+  if (selectedNodes.length !==null && newName) {
+    if (selectedNodes.length == 1) {
+      nodes.update({ id: selectedNodes[0], label: newName });
+      userArray.find((user) => user.name == nodes.get(selectedNodes[0]).id).name = newName; // Set the new name of the user
+    }
+    else {
+      nodes.update({ id: selectedNodes[1], label: newName });
+      userArray.find((user) => user.name == nodes.get(selectedNodes[1]).id).name = newName; // Set the new name of the user
+    }
     console.log(userArray);
   } else {
     alert("Please select a node and enter a valid name.");
   }
 }
+
+let selectedNodes = [];
+
+// Listen for selecting multiple nodes
+network.on("click", function (params) {
+  if (params.nodes.length > 0) {
+    const clickedNode = params.nodes[0];
+    selectedNodes.push(clickedNode);
+    if (selectedNodes.length > 2) {
+      selectedNodes.shift(); // Keep only the last two selected nodes
+    }
+    console.log("Selected nodes:", selectedNodes);
+    updateSelectedNodes();
+  }
+});
+
+// Function to add an edge between the selected nodes
+function addEdge() {
+  if (selectedNodes.length === 2) {
+    const [node1, node2] = selectedNodes;
+    edges.add({ from: node1, to: node2 }); // Add an undirected edge
+    user1 = userArray.find((user) => user == nodes.get(selectedNodes[0]).label) 
+    user2 = userArray.find((user) => user == nodes.get(selectedNodes[1]).label) 
+    user1.friends.push(user2); // Add the two users as friends
+    user2.friends.push(user1); // Add the two users as friends
+    selectedNodes = []; // Clear selection after adding the edge
+    updateSelectedNodes();
+  } else {
+    alert("Please select two nodes to connect.");
+  }
+}
+
+  // Reference to the HTML element that will display the selected nodes
+  const selNodes = document.getElementById("selected-nodes");
+  const from = document.getElementById("from");
+  const to = document.getElementById("to");
+
+  // Function to update the displayed text with the selected nodes
+  function updateSelectedNodes() {
+    if (selectedNodes.length === 0) {
+      selNodes.innerHTML = "Selected Nodes: None";
+    } else if (selectedNodes.length === 1) {
+      selNodes.innerHTML = `Selected Node: ${nodes.get(selectedNodes[0]).label}`;
+    } else {
+      selNodes.innerHTML = `Selected Nodes: ${nodes.get(selectedNodes[0]).label}, ${nodes.get(selectedNodes[1]).label}`;
+      from.innerHTML = `From: ${nodes.get(selectedNodes[0]).label}`;
+      to.innerHTML = `To: ${nodes.get(selectedNodes[1]).label}`;
+    }
+  }
