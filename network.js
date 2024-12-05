@@ -2,67 +2,67 @@ userArray = [];
 
 // User Class
 class User {
-    constructor(name) {
-      this.name = name;  // String
-      this.friends = []; // Array of Users
-      this.sentMessages = [];
-      this.receivedMessages = [];
-    }
-  
-    addFriend(user) {
-      if (!this.friends.includes(user)) {
-        this.friends.push(user);
-        user.friends.push(this);
-      }
-    }
+  constructor(name) {
+    this.name = name;  // String
+    this.friends = []; // Array of Users
+    this.sentMessages = [];
+    this.receivedMessages = [];
+  }
 
-    getFriends() {
-        const friendsList = this.friends.map((friend) => {
-            return friend.name;
-        })
-        return friendsList;
-    }
-
-    printFriends() {
-        this.friends.forEach((friend) => {
-            return console.log(`${this.name}\'s friends: ${this.getFriends()}`)
-        });
-    }
-
-    getReceivedMessages() {
-      return this.receivedMessages.map((message) => {
-        return runLengthDecode(message.messageBody) + ` (${message.sender.name})`;
-      });
-    }
-
-    getSentMessages() {
-      return this.sentMessages.map((message) => {
-        return runLengthDecode(message.messageBody) + ` (${message.receiver.name})`;
-      });
-    }
-
-    sendMessage(recipient, messageBody) { // (User, String)
-      const encodedMessage = runLengthEncode(messageBody);
-      const message = new Message(encodedMessage);
-      message.sender = this;
-      message.receiver = recipient;
-      message.metadata.messageEncoding = "RLE"
-      this.sentMessages.push(message);
-      recipient.receivedMessages.push(message);
+  addFriend(user) {
+    if (!this.friends.includes(user)) {
+      this.friends.push(user);
+      user.friends.push(this);
     }
   }
 
-  class Message {
-    constructor(messageBody) {
-        this.messageBody = messageBody; // String
-        this.messageBodyCompressed = "";
-        this.sender;                    // User
-        this.receiver;                  // User
-        this.metadata = {
-            messageEncoding: "",
-        }
+  getFriends() {
+      const friendsList = this.friends.map((friend) => {
+          return friend.name;
+      })
+      return friendsList;
+  }
+
+  printFriends() {
+      this.friends.forEach((friend) => {
+          return console.log(`${this.name}\'s friends: ${this.getFriends()}`)
+      });
+  }
+
+  getReceivedMessages() {
+    return this.receivedMessages.map((message) => {
+      return runLengthDecode(message.messageBody) + ` (${message.sender.name})`;
+    });
+  }
+
+  getSentMessages() {
+    return this.sentMessages.map((message) => {
+      return runLengthDecode(message.messageBody) + ` (${message.receiver.name})`;
+    });
+  }
+
+  sendMessage(recipient, messageBody) { // (User, String)
+    const encodedMessage = runLengthEncode(messageBody);
+    const message = new Message(encodedMessage);
+    message.sender = this;
+    message.receiver = recipient;
+    message.metadata.messageEncoding = "RLE"
+    this.sentMessages.push(message);
+    recipient.receivedMessages.push(message);
+  }
+}
+
+class Message {
+  constructor(messageBody) {
+    this.messageBody = messageBody; // String
+    this.messageBodyCompressed = "";
+    this.sender;                    // User
+    this.receiver;                  // User
+    this.metadata = {
+        messageEncoding: "",
     }
   }
+}
   
 
 // Merge Sort Function
