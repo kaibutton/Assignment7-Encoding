@@ -1,18 +1,22 @@
 const message = "The quick brown fox stepped quietly over the aggressive sleeping bear";
 const message2 = "WWWWWWWWWWWWBWWWWWWWWWWWWBBBWWWWWWWWWWWWWWWWWWWWWWWWBWWWWWWWWWWWWWW";
-const message3 = "space ";
+const message3 = "23 slowww ";
 
-function runLengthEncode(input) {
-  if (!input) return ""; // Handle empty strings
+
+/*
+runLengthEncode(message) only works with strings of alphanumeric characters (no numbers)
+*/
+function runLengthEncode(message) {
+  if (!message) return ""; // Handle empty strings
 
   let encoded = "";
   let count = 1;
 
-  for (let i = 1; i <= input.length; i++) {
-      if (input[i] === input[i - 1]) {
+  for (let i = 1; i <= message.length; i++) {
+      if (message[i] === message[i - 1]) {
           count++;
       } else {
-          encoded += input[i - 1] + count; // Append character and count
+          encoded += message[i - 1] + count; // Append character and count
           count = 1; // Reset count
       }
   }
@@ -41,8 +45,8 @@ function runLengthDecode(encoded) {
 }
 
 // Example Usage
-console.log(`message = "${message}"`);
-const encodedMessage = runLengthEncode(message);
-console.log(`encodedMessage = "${encodedMessage}"`);
+console.log(`message = "${message2}"`);
+const encodedMessage = runLengthEncode(message2);
+console.log(`encodedMessage = "${encodedMessage}"`); // Output: "W12B1W12B3W24B1W14"
 const decodedMessage = runLengthDecode(encodedMessage);
-console.log(`decodedMessage = "${decodedMessage}" = message = "${message}"`);
+console.log(`decodedMessage = "${decodedMessage}" = message2 = "${message2}"`); // Output: "WWWWWWWWWWWWBWWWWWWWWWWWWBBBWWWWWWWWWWWWWWWWWWWWWWWWBWWWWWWWWWWWWWW"
